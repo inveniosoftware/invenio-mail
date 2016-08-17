@@ -31,7 +31,7 @@ import os
 import sys
 
 import pytest
-from flask import Flask
+from flask import Blueprint, Flask
 from flask_celeryext import FlaskCeleryExt
 
 
@@ -63,3 +63,13 @@ def email_task_app(request):
     InvenioMail(app, StringIO())
 
     return app
+
+
+@pytest.fixture(scope='session')
+def email_api_app(email_task_app):
+    """Flask application fixture."""
+    email_task_app.register_blueprint(
+        Blueprint('invenio_mail', __name__, template_folder='templates')
+    )
+
+    return email_task_app

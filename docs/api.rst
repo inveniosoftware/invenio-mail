@@ -31,3 +31,8 @@ API Docs
 Tasks
 -----
 .. autotask:: invenio_mail.tasks.send_email
+
+Templated Messages
+------------------
+.. automodule:: invenio_mail.api
+   :members:
