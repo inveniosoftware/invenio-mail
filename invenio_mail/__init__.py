@@ -52,6 +52,51 @@ Next, let's send an email:
 Content-Type: text/plain; charset="utf-8"...
 
 
+Using the API
+-------------
+
+A nice API let you create a message from a template, so you just have to
+give the rights arguments to get the full message. Moreover, it creates
+a complete e-mail with HTML message and text only message.
+
+To do so, you need to instantiate
+a :class:`~invenio_mail.api.TemplatedMessage` object, just like you
+would with a standard :class:`flask_mail.Message`:
+
+
+When you have initialized your extension, you can create an email:
+
+>>> from invenio_mail.api import TemplatedMessage
+>>> with app.app_context():
+...    msg = TemplatedMessage(
+...         template_html="", # path to your template
+...         template_body="", # path to your template
+...         subject="Hello",
+...         sender='from@example.org',
+...         recipients=["to@example.com"],
+...         ctx={
+...             "content": "Hello, World!",
+...             "logo": "logo.png",
+...             "sender": "Sender",
+...             "user": "User"
+...         })
+
+You just need to add the templates to use and a ``ctx`` dictionnary,
+containing the values useful to fill the templates.
+
+If you ommit these 3 arguments, you will have the same result as you would
+with the standard :class:`flask_mail.Message` class.
+
+Note that you must be in the context of the application in order to
+be able to render the templates.
+
+Once you have created a message, you can send it the standard way:
+
+>>> with app.app_context():
+...     app.extensions['mail'].send(msg)
+Content-Type: text/plain; charset="utf-8"...
+
+
 Writing extensions
 ------------------
 By default you should just depend on Flask-Mail if you are writing an
