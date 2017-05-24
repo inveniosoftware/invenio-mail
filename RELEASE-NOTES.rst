@@ -1,8 +1,8 @@
 =======================
- Invenio-Mail v1.0.0b1
+ Invenio-Mail v1.0.0b2
 =======================
 
-Invenio-Mail v1.0.0b1 was released on December 5, 2016.
+Invenio-Mail v1.0.0b2 was released on May 24, 2017.
 
 About
 -----
@@ -17,7 +17,7 @@ What's new
 Installation
 ------------
 
-   $ pip install invenio-mail==1.0.0b1
+   $ pip install invenio-mail==1.0.0b2
 
 Documentation
 -------------
