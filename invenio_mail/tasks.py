@@ -12,11 +12,10 @@ from __future__ import absolute_import, print_function
 
 from celery import shared_task
 from flask import current_app
-from flask_celeryext import RequestContextTask
 from flask_mail import Message
 
 
-@shared_task(base=RequestContextTask)
+@shared_task
 def send_email(data):
     """Celery task for sending emails.
 
