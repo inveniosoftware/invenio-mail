@@ -17,7 +17,7 @@ from flask_mail import Message
 class TemplatedMessage(Message):
     """Siplify creation of templated messages."""
 
-    def __init__(self, template_body=None, template_html=None, ctx=None,
+    def __init__(self, template_body=None, template_html=None, ctx={},
                  **kwargs):
         r"""Build message body and HTML based on provided templates.
 

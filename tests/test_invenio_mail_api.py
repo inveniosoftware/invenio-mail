@@ -30,3 +30,11 @@ def test_templated_message(email_api_app, email_params, email_ctx):
         assert '{0}'.format(email_ctx['content']) in msg.body
         assert email_ctx['sender'] in msg.html
         assert email_ctx['sender'] in msg.body
+
+
+def test_simple_templated_message(email_api_app):
+    """Test that defaults are sane."""
+    with email_api_app.app_context():
+        msg = TemplatedMessage(template_body='invenio_mail/base.txt',
+                               template_html='invenio_mail/base.html')
+        assert msg
