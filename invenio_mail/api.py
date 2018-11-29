@@ -17,7 +17,7 @@ from flask_mail import Message
 class TemplatedMessage(Message):
     """Siplify creation of templated messages."""
 
-    def __init__(self, template_body=None, template_html=None, ctx={},
+    def __init__(self, template_body=None, template_html=None, ctx=None,
                  **kwargs):
         r"""Build message body and HTML based on provided templates.
 
@@ -31,6 +31,7 @@ class TemplatedMessage(Message):
         :param \*\*kwargs: Keyword arguments as defined in
             :class:`flask_mail.Message`.
         """
+        ctx = ctx if ctx else {}
         if template_body:
             kwargs['body'] = render_template(
                 template_body, body=kwargs.get('body'), **ctx
