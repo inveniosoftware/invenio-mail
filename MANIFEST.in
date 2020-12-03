@@ -21,6 +21,7 @@ recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include examples *.py
+recursive-include .github/workflows *.yml
 recursive-include invenio_mail *.mo *.po
 recursive-include misc *.py
 recursive-include misc *.rst
