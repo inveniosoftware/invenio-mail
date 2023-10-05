@@ -13,3 +13,6 @@ please refer to
 `Flask-Mail <https://pythonhosted.org/Flask-Mail/#configuring-flask-mail>`_'s
 list of configuration variables.
 """
+
+MAIL_DEFAULT_REPLY_TO = None
+"""Reply to mail address for e-mails."""

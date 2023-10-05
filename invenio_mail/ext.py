@@ -15,6 +15,8 @@ import threading
 
 from flask_mail import Mail, email_dispatched
 
+from . import config
+
 
 def print_email(message, app):
     """Print mail to stream.
@@ -76,3 +78,6 @@ class InvenioMail(object):
         """
         app.config.setdefault("MAIL_DEBUG", app.debug)
         app.config.setdefault("MAIL_SUPPRESS_SEND", app.debug or app.testing)
+        for k in dir(config):
+            if k.startswith("MAIL_"):
+                app.config.setdefault(k, getattr(config, k))
