@@ -2,6 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2023      University of Münster.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,11 +11,6 @@
 """Module tests."""
 
 from __future__ import absolute_import, print_function
-
-import os
-
-import pkg_resources
-from flask_mail import Attachment
 
 from invenio_mail.tasks import send_email
 
@@ -70,3 +66,33 @@ def test_send_message_with_date(email_task_app):
 
         result_stream = email_task_app.extensions["invenio-mail"].stream
         assert result_stream.getvalue().find("Date: Tue, 23 Feb 2016") != -1
+
+
+def test_send_message_stream_with_attachment(email_task_app):
+    """Test sending a message with attachment using Task module."""
+    with email_task_app.app_context():
+        with email_task_app.extensions["mail"].record_messages() as outbox:
+            msg = {
+                "subject": "Test2",
+                "sender": "test2@test2.test2",
+                "recipients": ["test2@test2.test2"],
+                "attachments": [
+                    {
+                        "base64": "RWluIGVpbmZhY2hlciBTdHJpbmcK",
+                        "disposition": "filename.bin",
+                    }
+                ],
+            }
+
+            send_email.delay(msg)
+
+            result_stream = email_task_app.extensions["invenio-mail"].stream
+            assert (
+                result_stream.getvalue().find("Content-Type: application/octet-stream")
+                != -1
+            )
+            assert (
+                result_stream.getvalue().find("Content-Disposition: filename.bin;")
+                != -1
+            )
+            assert result_stream.getvalue().find("RWluIGVpbmZhY2hlciBTdHJpbmcK") != -1
