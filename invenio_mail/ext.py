@@ -81,3 +81,5 @@ class InvenioMail(object):
         for k in dir(config):
             if k.startswith("MAIL_"):
                 app.config.setdefault(k, getattr(config, k))
+            if k.startswith("MAX_"):
+                app.config.setdefault(k, getattr(config, k))

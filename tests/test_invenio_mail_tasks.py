@@ -12,7 +12,8 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_mail.tasks import send_email
+from invenio_mail.errors import AttachmentOversizeException
+from invenio_mail.tasks import send_email, send_email_with_attachments
 
 
 def test_send_message_outbox(email_task_app):
@@ -76,15 +77,16 @@ def test_send_message_stream_with_attachment(email_task_app):
                 "subject": "Test2",
                 "sender": "test2@test2.test2",
                 "recipients": ["test2@test2.test2"],
+            }
+            attachments = {
                 "attachments": [
                     {
                         "base64": "RWluIGVpbmZhY2hlciBTdHJpbmcK",
                         "disposition": "filename.bin",
-                    }
-                ],
+                    },
+                ]
             }
-
-            send_email.delay(msg)
+            send_email_with_attachments(msg, attachments)
 
             result_stream = email_task_app.extensions["invenio-mail"].stream
             assert (
@@ -96,3 +98,27 @@ def test_send_message_stream_with_attachment(email_task_app):
                 != -1
             )
             assert result_stream.getvalue().find("RWluIGVpbmZhY2hlciBTdHJpbmcK") != -1
+
+
+def test_send_message_stream_with_oversize_attachment(email_task_app):
+    """Test sending a message with oversize attachment."""
+    with email_task_app.app_context():
+        with email_task_app.extensions["mail"].record_messages() as outbox:
+            msg = {
+                "subject": "Test2",
+                "sender": "test2@test2.test2",
+                "recipients": ["test2@test2.test2"],
+            }
+            attachments = {
+                "attachments": [
+                    {
+                        "base64": "RGllcyBpc3QgZGFzIEhhdXMgdm9tIE5pa29sYXVzCg==",
+                        "disposition": "filename.bin",
+                    },
+                ]
+            }
+            try:
+                send_email_with_attachments(msg, attachments)
+                assert False
+            except AttachmentOversizeException:
+                assert True

@@ -8,7 +8,6 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Background tasks for mail module."""
-
 from __future__ import absolute_import, print_function
 
 from base64 import b64decode
@@ -16,6 +15,19 @@ from base64 import b64decode
 from celery import shared_task
 from flask import current_app
 from flask_mail import Message
+
+from .errors import AttachmentOversizeException
+
+
+def send_email_with_attachments(data, attachments):
+    """Celery task for sending mails with attachments."""
+    for attachment in attachments["attachments"]:
+        if len(attachment["base64"]) > current_app.config["MAX_ATTACHMENT_SIZE"]:
+            raise AttachmentOversizeException
+
+    return _send_email_with_attachments.apply_async(
+        kwargs={"data": data, "attachments": attachments}
+    )
 
 
 @shared_task
@@ -36,11 +48,18 @@ def send_email(data):
        large to handle by the messaging queue, so check for a maximum size beforehand.
     """
     msg = Message()
-    attachments = data.pop("attachments", None)
+    msg.__dict__.update(data)
+
+    current_app.extensions["mail"].send(msg)
+
+
+@shared_task
+def _send_email_with_attachments(data, attachments):
+    msg = Message()
     msg.__dict__.update(data)
 
     if attachments is not None:
-        for attachment in attachments:
+        for attachment in attachments["attachments"]:
             rawdata = b64decode(attachment.get("base64"))
             content_type = "application/octet-stream"
             if "content_type" in attachment:

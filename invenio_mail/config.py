@@ -16,3 +16,6 @@ list of configuration variables.
 
 MAIL_DEFAULT_REPLY_TO = None
 """Reply to mail address for e-mails."""
+
+MAX_ATTACHMENT_SIZE = 1000000
+"""Max size of an attachment in bytes."""

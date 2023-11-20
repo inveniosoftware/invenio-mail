@@ -33,6 +33,7 @@ def email_task_app(request):
         CELERY_CACHE_BACKEND="memory",
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         MAIL_SUPPRESS_SEND=True,
+        MAX_ATTACHMENT_SIZE=30,
     )
     FlaskCeleryExt(app)
 
