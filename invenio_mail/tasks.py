@@ -22,7 +22,7 @@ from .errors import AttachmentOversizeException
 def send_email_with_attachments(data, attachments):
     """Celery task for sending mails with attachments."""
     for attachment in attachments["attachments"]:
-        if len(attachment["base64"]) > current_app.config["MAX_ATTACHMENT_SIZE"]:
+        if len(attachment["base64"]) > current_app.config["MAIL_MAX_ATTACHMENT_SIZE"]:
             raise AttachmentOversizeException
 
     return _send_email_with_attachments.apply_async(
