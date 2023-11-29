@@ -6,10 +6,7 @@
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-
 """Pytest configuration."""
-
-from __future__ import absolute_import, print_function
 
 import os
 from datetime import datetime
@@ -19,7 +16,7 @@ from flask import Blueprint, Flask
 from flask_celeryext import FlaskCeleryExt
 from six import StringIO
 
-from invenio_mail import InvenioMail, config
+from invenio_mail import InvenioMail
 
 
 @pytest.fixture(scope="session")

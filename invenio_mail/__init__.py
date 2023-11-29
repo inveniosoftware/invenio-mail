@@ -98,8 +98,6 @@ Remember to add Flask-Mail to your ``setup.py`` file as well:
     )
 """
 
-from __future__ import absolute_import, print_function
-
 from .ext import InvenioMail
 
 __version__ = "2.0.0"

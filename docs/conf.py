@@ -9,12 +9,6 @@
 
 """Sphinx configuration."""
 
-from __future__ import print_function
-
-import sys
-
-import sphinx.environment
-
 from invenio_mail import __version__
 
 # -- General configuration ------------------------------------------------

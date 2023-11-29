@@ -8,8 +8,6 @@
 
 """Test package API."""
 
-from __future__ import absolute_import, print_function
-
 from invenio_mail.api import TemplatedMessage
 
 

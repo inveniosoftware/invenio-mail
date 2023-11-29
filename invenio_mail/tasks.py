@@ -8,7 +8,6 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Background tasks for mail module."""
-from __future__ import absolute_import, print_function
 
 from base64 import b64decode
 
