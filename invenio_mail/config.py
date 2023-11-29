@@ -18,4 +18,4 @@ MAIL_DEFAULT_REPLY_TO = None
 """Reply to mail address for e-mails."""
 
 MAIL_MAX_ATTACHMENT_SIZE = 1000000
-"""Max size of an attachment in bytes."""
+"""Max size of inline attachments, in bytes."""
