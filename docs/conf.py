@@ -308,7 +308,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "flask": ("https://flask.palletsprojects.com", None),
-    "flask_mail": ("https://pythonhosted.org/Flask-Mail/", None),
+    "flask_mail": ("https://flask-mail.readthedocs.io/en/latest/", None),
 }
 
 # Autodoc configuraton.
