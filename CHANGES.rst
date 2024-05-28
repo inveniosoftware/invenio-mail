@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.1.1 (released 2024-05-28)
+
+- installation: upper pin flask-mail due to breaking changes in v0.10.0
+
 Version 2.1.0 (released 2023-11-29)
 
 - add a func to send e-mails with inline attachments
