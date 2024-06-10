@@ -46,7 +46,7 @@ setup_requires = [
 
 install_requires = [
     'Flask>=0.11.1',
-    'Flask-Mail>=0.9.1',
+    'Flask-Mail>=0.9.1,<0.10.0',
 ]
 
 packages = find_packages()
