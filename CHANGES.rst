@@ -7,6 +7,11 @@
 
 Changes
 =======
+
+Version 1.0.4 (released 2024-06-10)
+
+- Added Github workflows for pypi publishing
+
 Version 1.0.3 (released 2024-06-10)
 
 - Pin Flask-Mail due to breaking changes
