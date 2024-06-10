@@ -7,6 +7,10 @@
 
 Changes
 =======
+Version 1.0.3 (released 2024-06-10)
+
+- Pin Flask-Mail due to breaking changes
+
 Version 1.0.2 (released 2018-12-05)
 
 - Fixes issue with passing None context value to the e-mail template
