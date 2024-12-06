@@ -9,16 +9,31 @@
 
 """Background tasks for mail module."""
 
+import smtplib
 from base64 import b64decode
 
-from celery import shared_task
+from celery import Task, shared_task
 from flask import current_app
 from flask_mail import Message
 
 from .errors import AttachmentOversizeException
 
 
-def send_email_with_attachments(data, attachments=[]):
+class LoggingTask(Task):
+    """Task implementation to add logging functionality if task finally fails."""
+
+    max_retries = 2
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """When sending the message fails report to Logs."""
+        current_app.logger.error("Mail could not be dispatched!")
+        if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
+            current_app.logger.info(kwargs["data"]["body"])
+            if "attachments" in kwargs:
+                current_app.logger.info(kwargs["attachments"])
+
+
+def send_email_with_attachments(data, attachments=None):
     """Celery task for sending mails with attachments.
 
     :param data: a dict with the email fields
@@ -33,6 +48,8 @@ def send_email_with_attachments(data, attachments=[]):
     Note: attachment files are inline, added as Base64 encoded strings.
     The encoded string will be part of the payload, sent over network to Celery.
     """
+    if attachments is None:
+        attachments = []
     for attachment in attachments:
         if len(attachment["base64"]) > current_app.config["MAIL_MAX_ATTACHMENT_SIZE"]:
             raise AttachmentOversizeException
@@ -40,8 +57,8 @@ def send_email_with_attachments(data, attachments=[]):
     return _send_email_with_attachments.delay(data, attachments)
 
 
-@shared_task
-def send_email(data):
+@shared_task(bind=True, base=LoggingTask)
+def send_email(self, data):
     """Celery task for sending emails.
 
     .. warning::
@@ -60,12 +77,14 @@ def send_email(data):
     msg = Message()
     msg.__dict__.update(data)
 
-    current_app.extensions["mail"].send(msg)
+    _send(msg, self)
 
 
-@shared_task
-def _send_email_with_attachments(data, attachments=[]):
+@shared_task(bind=True, base=LoggingTask)
+def _send_email_with_attachments(self, data, attachments=None):
     """Celery task for sending emails with attachments."""
+    if attachments is None:
+        attachments = []
     msg = Message()
     msg.__dict__.update(data)
 
@@ -79,4 +98,19 @@ def _send_email_with_attachments(data, attachments=[]):
             disposition = attachment.get("disposition")
         msg.attach(content_type=content_type, data=rawdata, disposition=disposition)
 
-    current_app.extensions["mail"].send(msg)
+    _send(msg, self)
+
+
+def _send(msg, task):
+    """Send emails and add exception handling."""
+    try:
+        current_app.extensions["mail"].send(msg)
+    except (
+        smtplib.SMTPRecipientsRefused,
+        smtplib.SMTPHeloError,
+        smtplib.SMTPSenderRefused,
+        smtplib.SMTPDataError,
+        smtplib.SMTPNotSupportedError,
+    ):
+        if task.request.retries <= 2:
+            raise task.retry(countdown=current_app.config["MAIL_RETRY_COUNTDOWN"])
