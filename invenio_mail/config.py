@@ -19,3 +19,12 @@ MAIL_DEFAULT_REPLY_TO = None
 
 MAIL_MAX_ATTACHMENT_SIZE = 1000000
 """Max size of inline attachments, in bytes."""
+
+MAIL_MAX_RETRIES = 2
+"""How often will we repeat if a problem occurred."""
+
+MAIL_RETRY_COUNTDOWN = 180
+"""Countdown until next try of mail delivery is tried, in seconds."""
+
+MAIL_LOG_FAILED_MESSAGES = False
+"""Decide if we log the messages, too."""
