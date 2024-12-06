@@ -2,7 +2,7 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
-# Copyright (C) 2023      University of Münster.
+# Copyright (C) 2023-2024 University of Münster.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -12,25 +12,11 @@
 import smtplib
 from base64 import b64decode
 
-from celery import Task, shared_task
+from celery import shared_task
 from flask import current_app
 from flask_mail import Message
 
 from .errors import AttachmentOversizeException
-
-
-class LoggingTask(Task):
-    """Task implementation to add logging functionality if task finally fails."""
-
-    max_retries = 2
-
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        """When sending the message fails report to Logs."""
-        current_app.logger.error("Mail could not be dispatched!")
-        if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
-            current_app.logger.info(kwargs["data"]["body"])
-            if "attachments" in kwargs:
-                current_app.logger.info(kwargs["attachments"])
 
 
 def send_email_with_attachments(data, attachments=None):
@@ -57,7 +43,7 @@ def send_email_with_attachments(data, attachments=None):
     return _send_email_with_attachments.delay(data, attachments)
 
 
-@shared_task(bind=True, base=LoggingTask)
+@shared_task(bind=True)
 def send_email(self, data):
     """Celery task for sending emails.
 
@@ -80,7 +66,7 @@ def send_email(self, data):
     _send(msg, self)
 
 
-@shared_task(bind=True, base=LoggingTask)
+@shared_task(bind=True)
 def _send_email_with_attachments(self, data, attachments=None):
     """Celery task for sending emails with attachments."""
     if attachments is None:
@@ -101,7 +87,7 @@ def _send_email_with_attachments(self, data, attachments=None):
     _send(msg, self)
 
 
-def _send(msg, task):
+def _send(msg: Message, task):
     """Send emails and add exception handling."""
     try:
         current_app.extensions["mail"].send(msg)
@@ -112,5 +98,12 @@ def _send(msg, task):
         smtplib.SMTPDataError,
         smtplib.SMTPNotSupportedError,
     ):
-        if task.request.retries <= 2:
+        if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
             raise task.retry(countdown=current_app.config["MAIL_RETRY_COUNTDOWN"])
+        else:
+            current_app.logger.error("Mail could not be dispatched!")
+            if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
+                current_app.logger.info(msg.body)
+                if msg.attachments:
+                    for attachment in msg.attachments:
+                        current_app.logger.info(attachment.data)
