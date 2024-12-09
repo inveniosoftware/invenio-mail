@@ -107,3 +107,13 @@ def _send(msg: Message, task):
                 if msg.attachments:
                     for attachment in msg.attachments:
                         current_app.logger.info(attachment.data)
+    except Exception:
+        if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
+            raise task.retry(countdown=current_app.config["MAIL_RETRY_COUNTDOWN"])
+        else:
+            current_app.logger.error("Mail server does not answer to requests!")
+            if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
+                current_app.logger.info(msg.body)
+                if msg.attachments:
+                    for attachment in msg.attachments:
+                        current_app.logger.info(attachment.data)
