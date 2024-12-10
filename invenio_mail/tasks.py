@@ -9,6 +9,7 @@
 
 """Background tasks for mail module."""
 
+import random
 import smtplib
 from base64 import b64decode
 
@@ -99,7 +100,9 @@ def _send(msg, task):
         smtplib.SMTPNotSupportedError,
     ):
         if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
-            raise task.retry(countdown=current_app.config["MAIL_RETRY_COUNTDOWN"])
+            raise task.retry(
+                countdown=int(random.uniform(2, 4) ** task.request.retries)
+            )
         else:
             current_app.logger.error("Mail could not be dispatched!")
             if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
@@ -109,7 +112,9 @@ def _send(msg, task):
                         current_app.logger.info(attachment.data)
     except Exception:
         if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
-            raise task.retry(countdown=current_app.config["MAIL_RETRY_COUNTDOWN"])
+            raise task.retry(
+                countdown=int(random.uniform(2, 4) ** task.request.retries)
+            )
         else:
             current_app.logger.error("Mail server does not answer to requests!")
             if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:

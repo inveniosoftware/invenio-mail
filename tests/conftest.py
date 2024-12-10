@@ -33,7 +33,6 @@ def email_task_app(request):
         MAIL_SUPPRESS_SEND=True,
         MAIL_MAX_ATTACHMENT_SIZE=30,
         MAIL_MAX_RETRIES=2,
-        MAIL_RETRY_COUNTDOWN=1,
     )
     FlaskCeleryExt(app)
 
@@ -55,7 +54,6 @@ def email_task_failure_app(request):
         MAIL_SUPPRESS_SEND=False,
         MAIL_MAX_ATTACHMENT_SIZE=30,
         MAIL_MAX_RETRIES=2,
-        MAIL_RETRY_COUNTDOWN=1,
     )
     FlaskCeleryExt(app)
 
