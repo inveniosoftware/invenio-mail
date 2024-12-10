@@ -87,7 +87,7 @@ def _send_email_with_attachments(self, data, attachments=None):
     _send(msg, self)
 
 
-def _send(msg: Message, task):
+def _send(msg, task):
     """Send emails and add exception handling."""
     try:
         current_app.extensions["mail"].send(msg)
