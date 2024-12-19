@@ -22,6 +22,3 @@ MAIL_MAX_ATTACHMENT_SIZE = 1000000
 
 MAIL_MAX_RETRIES = 2
 """How often will we repeat if a problem occurred."""
-
-MAIL_LOG_FAILED_MESSAGES = False
-"""Decide if we log the messages, too."""
