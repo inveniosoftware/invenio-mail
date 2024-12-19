@@ -99,20 +99,9 @@ def _send(msg, task):
         smtplib.SMTPDataError,
         smtplib.SMTPNotSupportedError,
         Exception,
-    ) as excp:
+    ):
+        # Initially the distinction is quite useless, this will be clearer later when some logging is added
         if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
             raise task.retry(
                 countdown=int(random.uniform(2, 4) ** task.request.retries)
             )
-        else:
-            message = (
-                "Mail could not be dispatched!"
-                if isinstance(excp, smtplib.SMTPException)
-                else "Mail server does not answer to requests!"
-            )
-            current_app.logger.error(message)
-            if current_app.config["MAIL_LOG_FAILED_MESSAGES"]:
-                current_app.logger.info(msg.body)
-                if msg.attachments:
-                    for attachment in msg.attachments:
-                        current_app.logger.info(attachment.data)
