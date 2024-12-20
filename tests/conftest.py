@@ -14,6 +14,7 @@ from datetime import datetime
 import pytest
 from flask import Blueprint, Flask
 from flask_celeryext import FlaskCeleryExt
+from flask_mail import Mail
 from six import StringIO
 
 from invenio_mail import InvenioMail
@@ -31,10 +32,32 @@ def email_task_app(request):
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         MAIL_SUPPRESS_SEND=True,
         MAIL_MAX_ATTACHMENT_SIZE=30,
+        MAIL_MAX_RETRIES=2,
     )
     FlaskCeleryExt(app)
 
     InvenioMail(app, StringIO())
+
+    return app
+
+
+@pytest.fixture(scope="session")
+def email_task_failure_app(request):
+    """Flask application fixture."""
+    app = Flask("testapp")
+    app.config.update(
+        SQLALCHEMY_DATABASE_URI=os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite://"),
+        CELERY_ALWAYS_EAGER=True,
+        CELERY_RESULT_BACKEND="cache",
+        CELERY_CACHE_BACKEND="memory",
+        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+        MAIL_SUPPRESS_SEND=False,
+        MAIL_MAX_ATTACHMENT_SIZE=30,
+        MAIL_MAX_RETRIES=2,
+    )
+    FlaskCeleryExt(app)
+
+    Mail(app)
 
     return app
 
@@ -75,4 +98,16 @@ def email_ctx():
         "user": "User",
         "content": "This a content.",
         "sender": "sender",
+    }
+
+
+@pytest.fixture(scope="session")
+def email_message():
+    """Email message fixture."""
+    return {
+        "subject": "Subject",
+        "body": "This is a test message! Do not respond!",
+        "recipients": ["recipient@unit.test"],
+        "sender": "sender@unit.test",
+        "reply_to": "reply_to@unit.test",
     }

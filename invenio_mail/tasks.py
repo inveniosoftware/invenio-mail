@@ -2,13 +2,15 @@
 #
 # This file is part of Invenio.
 # Copyright (C) 2015-2018 CERN.
-# Copyright (C) 2023      University of Münster.
+# Copyright (C) 2023-2024 University of Münster.
 #
 # Invenio is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
 """Background tasks for mail module."""
 
+import random
+import smtplib
 from base64 import b64decode
 
 from celery import shared_task
@@ -18,7 +20,7 @@ from flask_mail import Message
 from .errors import AttachmentOversizeException
 
 
-def send_email_with_attachments(data, attachments=[]):
+def send_email_with_attachments(data, attachments=None):
     """Celery task for sending mails with attachments.
 
     :param data: a dict with the email fields
@@ -33,6 +35,8 @@ def send_email_with_attachments(data, attachments=[]):
     Note: attachment files are inline, added as Base64 encoded strings.
     The encoded string will be part of the payload, sent over network to Celery.
     """
+    if attachments is None:
+        attachments = []
     for attachment in attachments:
         if len(attachment["base64"]) > current_app.config["MAIL_MAX_ATTACHMENT_SIZE"]:
             raise AttachmentOversizeException
@@ -40,8 +44,8 @@ def send_email_with_attachments(data, attachments=[]):
     return _send_email_with_attachments.delay(data, attachments)
 
 
-@shared_task
-def send_email(data):
+@shared_task(bind=True)
+def send_email(self, data):
     """Celery task for sending emails.
 
     .. warning::
@@ -60,12 +64,14 @@ def send_email(data):
     msg = Message()
     msg.__dict__.update(data)
 
-    current_app.extensions["mail"].send(msg)
+    _send(msg, self)
 
 
-@shared_task
-def _send_email_with_attachments(data, attachments=[]):
+@shared_task(bind=True)
+def _send_email_with_attachments(self, data, attachments=None):
     """Celery task for sending emails with attachments."""
+    if attachments is None:
+        attachments = []
     msg = Message()
     msg.__dict__.update(data)
 
@@ -79,4 +85,23 @@ def _send_email_with_attachments(data, attachments=[]):
             disposition = attachment.get("disposition")
         msg.attach(content_type=content_type, data=rawdata, disposition=disposition)
 
-    current_app.extensions["mail"].send(msg)
+    _send(msg, self)
+
+
+def _send(msg, task):
+    """Send emails and add exception handling."""
+    try:
+        current_app.extensions["mail"].send(msg)
+    except (
+        smtplib.SMTPRecipientsRefused,
+        smtplib.SMTPHeloError,
+        smtplib.SMTPSenderRefused,
+        smtplib.SMTPDataError,
+        smtplib.SMTPNotSupportedError,
+        Exception,
+    ):
+        # Initially the distinction is quite useless, this will be clearer later when some logging is added
+        if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
+            raise task.retry(
+                countdown=int(random.uniform(2, 4) ** task.request.retries)
+            )

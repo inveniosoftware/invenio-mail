@@ -19,3 +19,6 @@ MAIL_DEFAULT_REPLY_TO = None
 
 MAIL_MAX_ATTACHMENT_SIZE = 1000000
 """Max size of inline attachments, in bytes."""
+
+MAIL_MAX_RETRIES = 2
+"""How often will we repeat if a problem occurred."""
