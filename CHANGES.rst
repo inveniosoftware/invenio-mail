@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version 2.2.0 (released 2024-12-20)
+
+- retry e-mail sending on failure with random backoff
+
 Version 2.1.1 (released 2024-05-28)
 
 - installation: upper pin flask-mail due to breaking changes in v0.10.0
