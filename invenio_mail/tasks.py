@@ -18,6 +18,7 @@ from flask import current_app
 from flask_mail import Message
 
 from .errors import AttachmentOversizeException
+from .logging import InvenioMailLogging
 
 
 def send_email_with_attachments(data, attachments=None):
@@ -105,3 +106,10 @@ def _send(msg, task):
             raise task.retry(
                 countdown=int(random.uniform(2, 4) ** task.request.retries)
             )
+        else:
+            mail_log = InvenioMailLogging()
+            mail_log.logger.debug(msg.recipients)
+            mail_log.logger.debug(msg.subject)
+            mail_log.logger.debug(msg.body)
+            for attachment in msg.attachments:
+                mail_log.logger.debug(attachment.data)
