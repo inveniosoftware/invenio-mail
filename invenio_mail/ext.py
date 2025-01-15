@@ -8,6 +8,7 @@
 
 """Invenio mail module."""
 
+import logging
 import sys
 import threading
 
@@ -62,6 +63,7 @@ class InvenioMail(object):
         :param app: Flask application object.
         """
         self.init_config(app)
+        self.init_logger(app)
         if "mail" not in app.extensions:
             Mail(app)
         if app.config.get("MAIL_SUPPRESS_SEND", False) or app.debug:
@@ -79,3 +81,14 @@ class InvenioMail(object):
         for k in dir(config):
             if k.startswith("MAIL_"):
                 app.config.setdefault(k, getattr(config, k))
+
+    def init_logger(self, app):
+        """Install log handler."""
+        level = app.config["MAIL_MIN_LOGGING_LEVEL"]
+        logger = logging.getLogger("invenio-mail")
+
+        # TODO: In the future we can have configurable handlers
+        handler = logging.StreamHandler()
+        logger.setLevel(level)
+        handler.setLevel(level)
+        logger.addHandler(handler)

@@ -9,6 +9,8 @@
 
 """Background tasks for mail module."""
 
+import json
+import logging
 import random
 import smtplib
 from base64 import b64decode
@@ -64,7 +66,7 @@ def send_email(self, data):
     msg = Message()
     msg.__dict__.update(data)
 
-    _send(msg, self)
+    _send(msg, self, original={"data": data})
 
 
 @shared_task(bind=True)
@@ -93,10 +95,10 @@ def _send_email_with_attachments(self, data, attachments=None):
             disposition=disposition,
         )
 
-    _send(msg, self)
+    _send(msg, self, original={"data": data, "attachments": attachments})
 
 
-def _send(msg, task):
+def _send(msg, task, original):
     """Send emails and add exception handling."""
     try:
         current_app.extensions["mail"].send(msg)
@@ -108,8 +110,12 @@ def _send(msg, task):
         smtplib.SMTPNotSupportedError,
         Exception,
     ):
-        # Initially the distinction is quite useless, this will be clearer later when some logging is added
         if task.request.retries <= current_app.config["MAIL_MAX_RETRIES"]:
             raise task.retry(
                 countdown=int(random.uniform(2, 4) ** task.request.retries)
             )
+        else:
+            logger = logging.getLogger("invenio-mail")
+            # We log the original data as JSON, so that we can recover both the body and
+            # attachments (in base64)
+            logger.warning(json.dumps(original))
