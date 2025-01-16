@@ -80,7 +80,8 @@ def test_send_message_stream_with_attachment(email_task_app):
             attachments = [
                 {
                     "base64": "RWluIGVpbmZhY2hlciBTdHJpbmcK",
-                    "disposition": "filename.bin",
+                    "disposition": "attachment",
+                    "filename": "filename.bin",
                 },
             ]
             send_email_with_attachments(msg, attachments)
@@ -88,7 +89,31 @@ def test_send_message_stream_with_attachment(email_task_app):
         assert len(outbox) == 1
         msg = outbox[0].as_string()
         assert "Content-Type: application/octet-stream" in msg
-        assert "Content-Disposition: filename.bin;" in msg
+        assert 'Content-Disposition: attachment; filename="filename.bin"' in msg
+        assert "RWluIGVpbmZhY2hlciBTdHJpbmcK" in msg
+
+
+def test_send_message_stream_with_attachment_no_filename(email_task_app):
+    """Test sending a message with attachment using Task module."""
+    with email_task_app.app_context():
+        with email_task_app.extensions["mail"].record_messages() as outbox:
+            msg = {
+                "subject": "Test2",
+                "sender": "test2@test2.test2",
+                "recipients": ["test2@test2.test2"],
+            }
+            attachments = [
+                {
+                    "base64": "RWluIGVpbmZhY2hlciBTdHJpbmcK",
+                    "disposition": "attachment",
+                },
+            ]
+            send_email_with_attachments(msg, attachments)
+
+        assert len(outbox) == 1
+        msg = outbox[0].as_string()
+        assert "Content-Type: application/octet-stream" in msg
+        assert "filename=" not in msg
         assert "RWluIGVpbmZhY2hlciBTdHJpbmcK" in msg
 
 
@@ -104,7 +129,8 @@ def test_send_message_stream_with_oversize_attachment(email_task_app):
             attachments = [
                 {
                     "base64": "RGllcyBpc3QgZGFzIEhhdXMgdm9tIE5pa29sYXVzCg==",
-                    "disposition": "filename.bin",
+                    "disposition": "attachment",
+                    "filename": "filename.bin",
                 },
             ]
             with pytest.raises(AttachmentOversizeException):
