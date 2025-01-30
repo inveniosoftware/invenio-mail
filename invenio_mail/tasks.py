@@ -84,7 +84,15 @@ def _send_email_with_attachments(self, data, attachments=None):
         disposition = None
         if "disposition" in attachment:
             disposition = attachment.get("disposition")
-        msg.attach(content_type=content_type, data=rawdata, disposition=disposition)
+        filename = None
+        if "filename" in attachment:
+            filename = attachment.get("filename")
+        msg.attach(
+            filename=filename,
+            content_type=content_type,
+            data=rawdata,
+            disposition=disposition,
+        )
 
     _send(msg, self)
 
