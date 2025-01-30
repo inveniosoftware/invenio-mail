@@ -14,6 +14,8 @@ please refer to
 list of configuration variables.
 """
 
+import logging
+
 MAIL_DEFAULT_REPLY_TO = None
 """Reply to mail address for e-mails."""
 
@@ -22,3 +24,6 @@ MAIL_MAX_ATTACHMENT_SIZE = 1000000
 
 MAIL_MAX_RETRIES = 2
 """How often will we repeat if a problem occurred."""
+
+MAIL_LOGGING_LEVEL = logging.WARNING
+"""Logging level."""
