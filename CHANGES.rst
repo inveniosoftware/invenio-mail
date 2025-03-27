@@ -8,6 +8,10 @@
 Changes
 =======
 
+Version v2.3.0 (released 2025-03-27)
+
+- tasks: enable optional logging of failed emails
+
 Version 2.2.1 (released 2025-01-29)
 
 - add filename to attachments
