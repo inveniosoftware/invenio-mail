@@ -1,4 +1,72 @@
-[build-system]
-requires = ["setuptools", "wheel", "babel>2.8"]
-build-backend = "setuptools.build_meta"
+# SPDX-FileCopyrightText: 2015-2018 CERN.
+# SPDX-FileCopyrightText: 2022 Graz University of Technology.
+# SPDX-FileCopyrightText: 2026 TU Wien.
+# SPDX-License-Identifier: MIT
 
+[project]
+name = "invenio-mail"
+description = "Invenio-Mail is an integration layer between Invenio and Flask-Mail."
+readme = "README.rst"
+requires-python = ">=3.7"
+license = "MIT"
+authors = [
+  { name = "CERN", email = "info@inveniosoftware.org" },
+]
+keywords = [
+  "invenio",
+  "mail",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+]
+dependencies = [
+  "flask>=0.11.1",
+  "flask-mail>=0.9.1,<0.10.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Repository = "https://github.com/inveniosoftware/invenio-mail"
+
+[project.entry-points."invenio_base.api_apps"]
+invenio_mail = "invenio_mail:InvenioMail"
+
+[project.entry-points."invenio_base.apps"]
+invenio_mail = "invenio_mail:InvenioMail"
+
+[project.entry-points."invenio_celery.tasks"]
+invenio_mail = "invenio_mail.tasks"
+
+[project.optional-dependencies]
+celery = []
+docs = []
+tests = [
+  "flask-celeryext>=0.2.2",
+  "pytest-black>=0.6.0",
+  "pytest-invenio>=3.0.0,<4.0.0",
+  "sphinx>=4.5.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "invenio_mail/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/invenio_mail",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+add_ignore = ""
+
+[tool.pytest.ini_options]
+addopts = '--black --isort --pydocstyle --doctest-glob="*.rst" --doctest-modules --cov=invenio_mail --cov-report=term-missing'
+filterwarnings = ["ignore::pytest.PytestDeprecationWarning"]
+testpaths = "tests invenio_mail"
+live_server_scope = "module"

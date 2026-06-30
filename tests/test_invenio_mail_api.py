@@ -13,7 +13,7 @@ def test_templated_message(email_api_app, email_params, email_ctx):
             template_body="invenio_mail/base.txt",
             template_html="invenio_mail/base.html",
             ctx=email_ctx,
-            **email_params
+            **email_params,
         )
 
         for key in email_params:
