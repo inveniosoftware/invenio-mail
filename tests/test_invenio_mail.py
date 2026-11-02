@@ -60,7 +60,7 @@ def test_print_email():
 
     sep = "\r\n" if PY3 else "\n"
 
-    assert "Subject: Test subject{0}".format(sep) in email
-    assert "From: from@example.com{0}".format(sep) in email
-    assert "To: to@example.com{0}".format(sep) in email
-    assert "{0}{0}Test Body".format(sep) in email
+    assert f"Subject: Test subject{sep}" in email
+    assert f"From: from@example.com{sep}" in email
+    assert f"To: to@example.com{sep}" in email
+    assert f"{sep}{sep}Test Body" in email

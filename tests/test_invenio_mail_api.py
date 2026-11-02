@@ -20,10 +20,10 @@ def test_templated_message(email_api_app, email_params, email_ctx):
             assert email_params[key] == getattr(msg, key), key
 
         # let's check that the body and html are correctly formatted
-        assert "<p>Dear {0},</p>".format(email_ctx["user"]) in msg.html
-        assert "Dear {0},".format(email_ctx["user"]) in msg.body
-        assert "<p>{0}</p>".format(email_ctx["content"]) in msg.html
-        assert "{0}".format(email_ctx["content"]) in msg.body
+        assert "<p>Dear {},</p>".format(email_ctx["user"]) in msg.html
+        assert "Dear {},".format(email_ctx["user"]) in msg.body
+        assert "<p>{}</p>".format(email_ctx["content"]) in msg.html
+        assert "{}".format(email_ctx["content"]) in msg.body
         assert email_ctx["sender"] in msg.html
         assert email_ctx["sender"] in msg.body
 
