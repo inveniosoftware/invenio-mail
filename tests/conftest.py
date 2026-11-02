@@ -5,12 +5,12 @@
 
 import os
 from datetime import datetime
+from io import StringIO
 
 import pytest
 from flask import Blueprint, Flask
 from flask_celeryext import FlaskCeleryExt
 from flask_mail import Mail
-from six import StringIO
 
 from invenio_mail import InvenioMail
 
