@@ -32,4 +32,4 @@ class TemplatedMessage(Message):
             kwargs["html"] = render_template(
                 template_html, html=kwargs.get("html"), **ctx
             )
-        super(TemplatedMessage, self).__init__(**kwargs)
+        super().__init__(**kwargs)

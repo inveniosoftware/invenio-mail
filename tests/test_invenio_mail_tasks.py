@@ -32,7 +32,7 @@ def test_send_message_outbox(email_task_app):
 def test_send_message_stream(email_task_app):
     """Test sending a message using Task module."""
     with email_task_app.app_context():
-        with email_task_app.extensions["mail"].record_messages() as outbox:
+        with email_task_app.extensions["mail"].record_messages():
             msg = {
                 "subject": "Test2",
                 "sender": "test2@test2.test2",
