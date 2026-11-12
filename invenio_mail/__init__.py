@@ -96,6 +96,6 @@ Remember to add Flask-Mail to your ``setup.py`` file as well:
 
 from .ext import InvenioMail
 
-__version__ = "2.3.1"
+__version__ = "2.3.2"
 
 __all__ = ("InvenioMail", "__version__")

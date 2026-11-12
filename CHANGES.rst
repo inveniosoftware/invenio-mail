@@ -6,6 +6,11 @@
 Changes
 =======
 
+Version v2.3.2 (released 2026-11-12)
+
+- chore: apply ruff linter fixes
+- fix(tests): replace import from `six` with `io`
+
 Version v2.3.1 (released 2026-07-16)
 
 - chore(setup): migrate from setuptools to hatchling
