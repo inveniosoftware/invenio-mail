@@ -6,7 +6,7 @@
 [project]
 name = "invenio-mail"
 description = "Invenio-Mail is an integration layer between Invenio and Flask-Mail."
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.7"
 license = "MIT"
 authors = [
@@ -39,12 +39,15 @@ invenio_mail = "invenio_mail.tasks"
 
 [project.optional-dependencies]
 celery = []
-docs = []
+docs = [
+  "zensical; python_version >= '3.10'",
+  "mkdocstrings[python]; python_version >= '3.10'",
+]
 tests = [
   "flask-celeryext>=0.2.2",
   "pytest-black>=0.6.0",
   "pytest-invenio>=3.0.0,<4.0.0",
-  "sphinx>=4.5.0",
+  "invenio-mail[docs]",
 ]
 
 [build-system]
@@ -66,7 +69,7 @@ profile = "black"
 add_ignore = ""
 
 [tool.pytest.ini_options]
-addopts = '--black --isort --pydocstyle --doctest-glob="*.rst" --doctest-modules --cov=invenio_mail --cov-report=term-missing'
+addopts = '--black --isort --pydocstyle --doctest-modules --cov=invenio_mail --cov-report=term-missing'
 filterwarnings = ["ignore::pytest.PytestDeprecationWarning"]
 testpaths = "tests invenio_mail"
 live_server_scope = "module"

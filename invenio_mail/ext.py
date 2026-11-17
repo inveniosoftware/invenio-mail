@@ -18,8 +18,9 @@ def print_email(message, app):
     Signal handler for email_dispatched signal. Prints by default the output
     to the stream specified in the constructor of InvenioMail.
 
-    :param message: Message object.
-    :param app: Flask application object.
+    Args:
+        message: Message object.
+        app: Flask application object.
     """
     invenio_mail = app.extensions["invenio-mail"]
     with invenio_mail._lock:
@@ -33,11 +34,12 @@ class InvenioMail:
     def __init__(self, app=None, stream=None):
         """Extension initialization.
 
-        Mails are only printed to the stream if ``MAIL_SUPPRESS_SEND`` is
-        ``True``.
+        Mails are only printed to the stream if `MAIL_SUPPRESS_SEND` is
+        `True`.
 
-        :param app: Flask application object.
-        :param stream: Stream to print emails to. Defaults to ``sys.stdout``.
+        Args:
+            app: Flask application object.
+            stream: Stream to print emails to. Defaults to `sys.stdout`.
         """
         self.stream = stream or sys.stdout
         self._lock = threading.RLock()
@@ -49,13 +51,14 @@ class InvenioMail:
 
         The initialization will:
 
-         * Set default values for the configuration variables.
-         * Initialise the Flask mail extension.
-         * Configure the extension to avoid the email sending in case of debug
-           or ``MAIL_SUPPRESS_SEND`` config variable set. In this case, the
-           email will be written in the stream configured in the extension.
+        - Set default values for the configuration variables.
+        - Initialise the Flask mail extension.
+        - Configure the extension to avoid the email sending in case of debug
+          or `MAIL_SUPPRESS_SEND` config variable set. In this case, the
+          email will be written in the stream configured in the extension.
 
-        :param app: Flask application object.
+        Args:
+            app: Flask application object.
         """
         self.init_config(app)
         self.init_logger(app)
@@ -69,7 +72,8 @@ class InvenioMail:
     def init_config(app):
         """Initialize configuration.
 
-        :param app: Flask application object.
+        Args:
+            app: Flask application object.
         """
         app.config.setdefault("MAIL_DEBUG", app.debug)
         app.config.setdefault("MAIL_SUPPRESS_SEND", app.debug or app.testing)

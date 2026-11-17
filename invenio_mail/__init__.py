@@ -6,13 +6,14 @@
 
 The Invenio-Mail module is a tiny wrapper around Flask-Mail that provides
 printing of emails to standard output when the configuration variable
-``MAIL_SUPPRESS_SEND`` is ``True``.
+`MAIL_SUPPRESS_SEND` is `True`.
 
 Invenio-Mail also takes care of initializing Flask-Mail if not already
 initialized.
 
 First, initialize the extension:
 
+```pycon
 >>> from flask import Flask
 >>> from invenio_mail import InvenioMail
 >>> app = Flask('myapp')
@@ -20,8 +21,11 @@ First, initialize the extension:
 >>> InvenioMail(app)
 <invenio_mail.ext.InvenioMail ...>
 
+```
+
 Next, let's send an email:
 
+```pycon
 >>> from flask_mail import Message
 >>> msg = Message('Hello', sender='from@example.org',
 ...    recipients=['to@example.com'], body='Hello, World!')
@@ -29,15 +33,19 @@ Next, let's send an email:
 ...     app.extensions['mail'].send(msg)
 Content-Type: text/plain; charset="utf-8"...
 
-Template based messages
------------------------
+```
+
+## Template based messages
+
 A simple API lets you create a message from a template, so you just have to
 give the right arguments to get the full message. Moreover, it can create
 a complete e-mail with both HTML and text content.
 
-First, you need to instantiate the :class:`~invenio_mail.api.TemplatedMessage`
-class, just like you would do with a standard :class:`flask_mail.Message`:
+First, you need to instantiate the
+[`TemplatedMessage`][invenio_mail.api.TemplatedMessage] class, just like you
+would do with a standard `flask_mail.Message`:
 
+```pycon
 >>> from invenio_mail.api import TemplatedMessage
 >>> with app.app_context():
 ...    msg = TemplatedMessage(
@@ -53,45 +61,48 @@ class, just like you would do with a standard :class:`flask_mail.Message`:
 ...             'user': 'User',
 ...         })
 
-You just need to add the templates to use and a ``ctx`` dictionary,
+```
+
+You just need to add the templates to use and a `ctx` dictionary,
 containing the values useful to fill the templates. If you ommit these three
 arguments, you will have the same result as you would with the standard
-:class:`flask_mail.Message` class.
+`flask_mail.Message` class.
 
 Note that you must be in the application context in order to be able to render
 the templates. Once you have created a message, you can send it the standard
 way:
 
+```pycon
 >>> with app.app_context():
 ...     app.extensions['mail'].send(msg)
 Content-Type: text/plain; charset="utf-8"...
 
+```
 
-Writing extensions
-------------------
+## Writing extensions
+
 By default you should just depend on Flask-Mail if you are writing an
 extension which needs email sending functionality:
 
-.. code-block:: python
+```python
+from flask import current_app
+from flask_mail import Message
 
-   from flask import current_app
-   from flask_mail import Message
+def mystuff():
+    msg = Message('Hello', sender='from@example.org',
+                  recipients=['to@example.com'], body='Hello, World!')
+    current_app.extensions['mail'].send(msg)
+```
 
-   def mystuff():
-       msg = Message('Hello', sender='from@example.org',
-                     recipients=['to@example.com'], body='Hello, World!')
-       current_app.extensions['mail'].send(msg)
+Remember to add Flask-Mail to the dependencies in your `pyproject.toml` file
+as well:
 
-
-Remember to add Flask-Mail to your ``setup.py`` file as well:
-
-.. code-block:: python
-
-   setup(
-       # ...
-       install_requires = ['Flask-Mail>=0.9.1',]
-       #...
-    )
+```toml
+[project]
+dependencies = [
+    "Flask-Mail>=0.9.1",
+]
+```
 """
 
 from .ext import InvenioMail

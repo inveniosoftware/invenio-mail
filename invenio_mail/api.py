@@ -8,20 +8,20 @@ from flask_mail import Message
 
 
 class TemplatedMessage(Message):
-    """Siplify creation of templated messages."""
+    """Simplify creation of templated messages."""
 
     def __init__(self, template_body=None, template_html=None, ctx=None, **kwargs):
-        r"""Build message body and HTML based on provided templates.
+        """Build message body and HTML based on provided templates.
 
-        Provided templates can use keyword arguments ``body`` and ``html``
+        Provided templates can use keyword arguments `body` and `html`
         respectively.
 
-        :param template_body: Path to the text template.
-        :param template_html: Path to the html template.
-        :param ctx: A mapping containing additional information passed to the
-            template.
-        :param \*\*kwargs: Keyword arguments as defined in
-            :class:`flask_mail.Message`.
+        Args:
+            template_body: Path to the text template.
+            template_html: Path to the html template.
+            ctx: A mapping containing additional information passed to the
+                template.
+            **kwargs: Keyword arguments as defined in `flask_mail.Message`.
         """
         ctx = ctx if ctx else {}
         if template_body:

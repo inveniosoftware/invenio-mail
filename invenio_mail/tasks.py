@@ -20,17 +20,27 @@ from .errors import AttachmentOversizeException
 def send_email_with_attachments(data, attachments=None):
     """Celery task for sending mails with attachments.
 
-    :param data: a dict with the email fields
-    :param attachments: a list of dicts, in the following form:
-        attachments = [
+    Args:
+        data: A dict with the email fields.
+        attachments: A list of dicts, in the following form:
+
+            ```python
+            attachments = [
                 {
                     "base64": "RGllcyBpc3QgZGFzIEhhdXMgdm9tIE5pa29sYXVzCg==",
                     "disposition": "filename.bin",
                 },
             ]
+            ```
 
-    Note: attachment files are inline, added as Base64 encoded strings.
-    The encoded string will be part of the payload, sent over network to Celery.
+    Raises:
+        AttachmentOversizeException: If an attachment is larger than
+            `MAIL_MAX_ATTACHMENT_SIZE`.
+
+    !!! note
+        Attachment files are inline, added as Base64 encoded strings.
+        The encoded string will be part of the payload, sent over network to
+        Celery.
     """
     if attachments is None:
         attachments = []
@@ -45,18 +55,18 @@ def send_email_with_attachments(data, attachments=None):
 def send_email(self, data):
     """Celery task for sending emails.
 
-    .. warning::
+    !!! warning
+        Attachments do not work with Celery tasks since
+        `flask_mail.Attachment` is not serializable in `JSON`
+        nor `msgpack`. Note that a
+        [custom serializer](https://docs.celeryq.dev/en/latest/userguide/calling.html#serializers)
+        can be created if attachments are really needed.
 
-       Attachments do not work with Celery tasks since
-       :class:`flask_mail.Attachment` is not serializable in ``JSON``
-       nor ``msgpack``. Note that a
-       `custom serializer <http://docs.celeryproject.org/en/latest/
-       userguide/calling.html#serializers>`__
-       can be created if attachments are really needed.
-
-       This version adds attachments by putting them into a base64 encoded string.
-       This is not an optimal solution, it might get problematic if they are too
-       large to handle by the messaging queue, so check for a maximum size beforehand.
+        Use [`send_email_with_attachments`][invenio_mail.tasks.send_email_with_attachments]
+        instead, which adds attachments by putting them into a base64 encoded
+        string. This is not an optimal solution, it might get problematic if
+        they are too large to handle by the messaging queue, so check for a
+        maximum size beforehand.
     """
     msg = Message()
     msg.__dict__.update(data)
