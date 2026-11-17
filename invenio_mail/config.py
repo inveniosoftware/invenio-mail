@@ -5,7 +5,7 @@
 
 Invenio-Mail is a tiny integration layer between Invenio and Flask-Mail, so
 please refer to
-`Flask-Mail <https://pythonhosted.org/Flask-Mail/#configuring-flask-mail>`_'s
+[Flask-Mail](https://flask-mail.readthedocs.io/en/latest/#configuring-flask-mail)'s
 list of configuration variables.
 """
 
